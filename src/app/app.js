@@ -14,24 +14,32 @@ import testCasesRoute from '../route/testCasesRoute.js';
 import testImagesRoute from '../route/testImagesRoute.js';
 import testCommentsRoute from '../route/testCommentsRoute.js';
 import projectAssignmentsCommentsRoute from '../route/projectAssignmentsCommentsRoute.js';
-import defectRoute from '../route/defectRoute.js';
+import defectRoute from '../route/defectRoute.js'
+
 
 const app = express();
 
-const cors = require('cors');
-app.use(cors({
-    origin: 'https://testsync.online', // use your actual domain name (or localhost), using * is not recommended
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
-    credentials: true
-}))
+app.use(cors());
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
-  });
+const corsOptions = {
+    origin: 'https://testsync.online', 
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: ['Content-Type','Authorization', 'x-access-token'],
+  };
+app.use(cors(corsOptions));
+// Maneja la solicitud OPTIONS para CORS preflight
+app.options('*', cors(corsOptions));
 
+// Middleware adicional para asegurarse de que los encabezados de CORS se envían en todas las respuestas
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "https://testsync.online");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, x-access-token");
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
@@ -43,7 +51,7 @@ const __dirname = path.dirname(__filename);
 // Servir archivos estáticos desde la carpeta uploads
 app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
-// Usa las rutas
+// Use routes 
 app.use('/api/user', userRouter);
 app.use('/api/project', projectRoute);
 app.use('/api/meeting', meetingRoute);
@@ -54,5 +62,6 @@ app.use('/api/test-cases', testCasesRoute);
 app.use('/api/test-images', testImagesRoute);
 app.use('/api/test-comments', testCommentsRoute);
 app.use('/api/defects', defectRoute);
+
 
 export default app;
