@@ -4,7 +4,6 @@ import logger from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url'; // Importa fileURLToPath
 
-
 // Import routes 
 import userRouter from '../route/userRoute.js';
 import projectRoute from '../route/projectRoute.js';
@@ -15,19 +14,21 @@ import testCasesRoute from '../route/testCasesRoute.js';
 import testImagesRoute from '../route/testImagesRoute.js';
 import testCommentsRoute from '../route/testCommentsRoute.js';
 import projectAssignmentsCommentsRoute from '../route/projectAssignmentsCommentsRoute.js';
-import defectRoute from '../route/defectRoute.js'
-
+import defectRoute from '../route/defectRoute.js';
 
 const app = express();
 
+// Define las opciones de CORS
 const corsOptions = {
-    origin: 'https://testsync.online', // Reemplaza con el dominio permitido
+    origin: 'https://testsync.online', // Dominio permitido
     methods: 'GET,POST,PUT,DELETE', // Métodos HTTP permitidos
-    allowedHeaders: ['Content-Type','Authorization', 'x-access-token'], // Headers permitidos
-  };
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'], // Headers permitidos
+};
 
-app.use(cors());
-app.options('*', cors()); // Esto permite las solicitudes OPTIONS para cualquier ruta
+// Aplica CORS con opciones específicas
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Permite solicitudes OPTIONS para todas las rutas
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
@@ -39,7 +40,7 @@ const __dirname = path.dirname(__filename);
 // Servir archivos estáticos desde la carpeta uploads
 app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
-// Use routes 
+// Usa las rutas
 app.use('/api/user', userRouter);
 app.use('/api/project', projectRoute);
 app.use('/api/meeting', meetingRoute);
@@ -50,6 +51,5 @@ app.use('/api/test-cases', testCasesRoute);
 app.use('/api/test-images', testImagesRoute);
 app.use('/api/test-comments', testCommentsRoute);
 app.use('/api/defects', defectRoute);
-
 
 export default app;
