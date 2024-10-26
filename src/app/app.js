@@ -18,16 +18,19 @@ import defectRoute from '../route/defectRoute.js';
 
 const app = express();
 
-// Define las opciones de CORS
-const corsOptions = {
-    origin: 'https://testsync.online', // Dominio permitido
-    methods: 'GET,POST,PUT,DELETE', // Métodos HTTP permitidos
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'], // Headers permitidos
-};
+const cors = require('cors');
+app.use(cors({
+    origin: 'https://testsync.online', // use your actual domain name (or localhost), using * is not recommended
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
+    credentials: true
+}))
 
-// Aplica CORS con opciones específicas
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Permite solicitudes OPTIONS para todas las rutas
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+  });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
